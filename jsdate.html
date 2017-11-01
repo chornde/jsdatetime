@@ -1,0 +1,100 @@
+<html>
+	<head>
+	</head>
+	<body>
+		<script>
+			function DateMod (date) {
+			
+				this.pattern = /(\+|-)(\d){1,}(d|w|m|y)/;
+				this.source = date;
+			 
+				this.getStart = function () {
+					return this.source;
+				}
+			 
+				this.shorten = function (format) {
+					var trimed = format.replace(/ /g,'');
+					var singular = trimed.replace(/s/g,'');
+					var abbreviation = singular.replace(/day/g,'d').replace(/week/g,'w').replace(/month/g,'m').replace(/year/g,'y');
+					return abbreviation;
+				}
+			 
+				this.parse = function (format) {
+					var shorter = this.shorten(format);
+					var match = shorter.match(this.pattern);
+					if(match === null) console.log('invalid format');
+					return (match !== null) ? match : ['', '+', '0', 'd']; // fallback will do nothing
+				}
+			 
+				this.modify = function (format) {
+					var modifier = this.parse(format);
+					var op = modifier[1];
+					var val = parseInt(modifier[2]);
+					var unit = modifier[3];
+					
+					var multi = (op == '+') ? +1 : -1 ;
+					
+					if(unit == 'w'){ // normalize weeks
+						val *= 7;
+						unit = 'd';
+					}
+					
+					var years = 0;
+					var months = 0;
+					var days = 0;
+					
+					if(unit == 'y'){
+						years = val * multi;
+					}
+					else if(unit == 'm'){
+						months = val * multi;
+					}
+					else if(unit == 'd'){
+						days = val * multi;
+					}
+					
+					var target = new Date(
+						this.source.getFullYear() + years,
+						this.source.getMonth() + months,
+						this.source.getDate() + days
+					);
+					
+					return target;
+				}
+			}
+
+			/*
+				var mod = new DateMod(new Date('2020-02-29')); // leap year
+				console.log(mod.getStart());
+				console.log(mod.modify('+1d'));
+				console.log(mod.modify('+2day'));
+				console.log(mod.modify('+3days'));
+				console.log(mod.modify('+ 4  d'));
+				console.log(mod.modify('+5 day'));
+				console.log(mod.modify('+ 6 day'));
+				console.log(mod.modify('+ 7 days'));
+				console.log(mod.modify('+  8 days'));
+				console.log(mod.modify('+1w'));
+				console.log(mod.modify('+2week'));
+				console.log(mod.modify('+ 3week'));
+				console.log(mod.modify('+4weeks'));
+				console.log(mod.modify('+ 5weeks'));
+				console.log(mod.modify('+  6weeks'));
+				console.log(mod.modify('+  7 weeks'));
+				console.log(mod.modify('+1m'));
+				console.log(mod.modify('+ 2 m'));
+				console.log(mod.modify('+3month'));
+				console.log(mod.modify('+4months'));
+				console.log(mod.modify('+ 5month'));
+				console.log(mod.modify('+ 6 month'));
+				console.log(mod.modify('+ 7 months'));
+				console.log(mod.modify('+1y'));
+				console.log(mod.modify('+2 y'));
+				console.log(mod.modify(' +3 y'));
+				console.log(mod.modify(' +4 year'));
+				console.log(mod.modify(' +5 years'));
+				console.log(mod.modify(' + 6 years'));
+			*/
+		</script>
+	</body>
+</html>
